@@ -37,7 +37,7 @@ jobs:
 
       - run:
           name: pull image from private repository
-          command: docker pull 590184080569.dkr.ecr.us-east-1.amazonaws.com/hate_speech:latest
+          command: docker pull 590184080569.dkr.ecr.us-east-1.amazonaws.com/demo:latest
           
       
       - run:

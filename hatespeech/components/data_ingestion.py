@@ -3,7 +3,7 @@ import sys
 from zipfile import ZipFile
 from hatespeech.logger import logging
 from hatespeech.exception import CustomException
-from hatespeech.configuration.s3_operations import S3Operation
+from hatespeech.configuration.gcloud_syncer import GCloudSync
 from hatespeech.entity.config_entity import DataIngestionConfig
 from hatespeech.entity.artifact_entity import DataIngestionArtifacts
 
@@ -11,20 +11,20 @@ from hatespeech.entity.artifact_entity import DataIngestionArtifacts
 class DataIngestion:
     def __init__(self, data_ingestion_config : DataIngestionConfig):
         self.data_ingestion_config = data_ingestion_config
-        self.s3_operations = S3Operation()
+        self.gcloud = GCloudSync()
 
 
-    def get_data_from_s3(self) -> None:
+    def get_data_from_gcloud(self) -> None:
         try:
-            logging.info("Entered the get_data_from_s3 method of Data ingestion class")
+            logging.info("Entered the get_data_from_gcloud method of Data ingestion class")
             os.makedirs(self.data_ingestion_config.DATA_INGESTION_ARTIFACTS_DIR, exist_ok=True)
 
-            self.s3_operations.read_data_from_s3(self.data_ingestion_config.ZIP_FILE_NAME,
-                                                self.data_ingestion_config.BUCKET_NAME,
-                                                self.data_ingestion_config.ZIP_FILE_PATH
+            self.gcloud.sync_folder_from_gcloud(self.data_ingestion_config.BUCKET_NAME,
+                                                self.data_ingestion_config.ZIP_FILE_NAME,
+                                                self.data_ingestion_config.DATA_INGESTION_ARTIFACTS_DIR,
                                                 )
             
-            logging.info("Exited the get_data_from_s3 method of Data ingestion class")
+            logging.info("Exited the get_data_from_gcloud method of Data ingestion class")
 
         
         except Exception as e:
@@ -50,8 +50,8 @@ class DataIngestion:
         logging.info("Entered the initiate_data_ingestion method of Data ingestion class")
 
         try:
-            self.get_data_from_s3()
-            logging.info("Fetched the data from s3 bucket")
+            self.get_data_from_gcloud()
+            logging.info("Fetched the data from gcloud bucket")
             imbalance_data_file_path, raw_data_file_path = self.unzip_and_clean()
             logging.info("Unzipped file and split into train and valid")
 
